@@ -26,8 +26,11 @@ router.post('/loginUser', usersController.loginUser);
 
 // Movies Routes
 
-// search
+// search index
 router.get('/api/searchMovies/', favoriteMoviesController.search);
+
+// search show
+router.get('/api/searchMovies/:id', favoriteMoviesController.searchOne);
 
 // index
 router.get('/api/favorites', favoriteMoviesController.index);

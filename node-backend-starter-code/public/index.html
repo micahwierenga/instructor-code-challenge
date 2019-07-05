@@ -20,10 +20,10 @@
 				<button id="logout-btn" class="button is-link nav-button">LOGOUT</button>
 			</div>
 			<div id="signup-div" class="nav-item">
-				<button id="signup-btn" class="button nav-button">SIGNUP</button>
+				<button id="signup-btn" class="button nav-button open-modal-button" data-modal-type="signup-modal">SIGNUP</button>
 			</div>
 			<div id="login-div" class="nav-item">
-				<button id="login-btn" class="button is-link nav-button">LOGIN</button>
+				<button id="login-btn" class="button is-link nav-button open-modal-button" data-modal-type="login-modal">LOGIN</button>
 			</div>
 		</div>
 	</div>
@@ -50,7 +50,7 @@
 		<div class="modal-card">
 			<header class="modal-card-head">
 				<p class="modal-card-title">Signup</p>
-				<button id="signup-close" class="delete" aria-label="close"></button>
+				<button id="signup-close" class="delete close-modal-button" aria-label="close"></button>
 			</header>
 			<section class="modal-card-body">
 				<form id="signup-form">
@@ -86,10 +86,10 @@
 					</div>
 					<div class="field">
 					  <p class="control">
-					    <button type="submit" id="signup-submit" class="button is-success">
+					    <button id="signup-submit" class="button is-success">
 					      Sign Up
 					    </button>
-						<button id="signup-cancel" class="button">Cancel</button>
+						<button id="signup-cancel" class="button close-modal-button">Cancel</button>
 					  </p>
 					</div>
 				</form>
@@ -102,7 +102,7 @@
 		<div class="modal-card">
 			<header class="modal-card-head">
 				<p class="modal-card-title">Login</p>
-				<button id="login-close" class="delete" aria-label="close"></button>
+				<button id="login-close" class="delete close-modal-button" aria-label="close"></button>
 			</header>
 			<section class="modal-card-body">
 				<form>
@@ -125,15 +125,91 @@
 					    </span>
 					  </p>
 					</div>
+					<div id="invalid-login-message-container">
+						<span id="invalid-login-message" class="has-text-danger"></span>
+					</div>
 					<div class="field">
 					  <p class="control">
-					    <button class="button is-success">
+					    <button id="login-submit" class="button is-success">
 					      Login
 					    </button>
-						<button id="login-cancel" class="button">Cancel</button>
+						<button id="login-cancel" class="button close-modal-button">Cancel</button>
 					  </p>
 					</div>
 				</form>
+			</section>
+		</div>
+	</div>
+
+	<div id="movie-details-modal" class="modal">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+				<p id="movie-details-title" class="modal-card-title"></p>
+				<button id="movie-details-close" class="delete close-modal-button" aria-label="close"></button>
+			</header>
+			<section class="modal-card-body">
+				<div id="movie-details-container">
+					<div id="movie-details-image-container"></div>
+					<div id="movie-details-short-text-container">
+						<p class="movie-details-short-text"><strong>Year:</strong> <span id="movie-details-year"></span></p>
+						<p class="movie-details-short-text"><strong>Rated:</strong> <span id="movie-details-rated"></span></p>
+						<p class="movie-details-short-text"><strong>Released:</strong> <span id="movie-details-released"></span></p>
+						<p class="movie-details-short-text"><strong>Runtime:</strong> <span id="movie-details-runtime"></span></p>
+						<p class="movie-details-short-text"><strong>Genre:</strong> <span id="movie-details-genre"></span></p>
+						<p class="movie-details-short-text"><strong>Director:</strong> <span id="movie-details-director"></span></p>
+						<p class="movie-details-short-text"><strong>Writer(s):</strong> <span id="movie-details-writer"></span></p>
+						<p class="movie-details-short-text"><strong>Actors:</strong> <span id="movie-details-actors"></span></p>
+						<p class="movie-details-long-text"><strong>Plot:</strong> <span id="movie-details-plot"></span></p>
+					</div>
+					<div id="movie-details-long-text-container">
+						<p class="movie-details-long-text"><strong>Ratings:</strong> <ul id="movie-details-ratings-list"></ul></p>
+						<p class="movie-details-long-text"><strong>Metascore:</strong> <span id="movie-details-metascore"></span></p>
+						<p class="movie-details-long-text"><strong>IMDB Rating:</strong> <span id="movie-details-imdbrating"></span></p>
+						<p class="movie-details-long-text"><strong>IMDB Votes:</strong> <span id="movie-details-imdbvotes"></span></p>
+						<p class="movie-details-long-text"><strong>IMDB ID:</strong> <span id="movie-details-imdbid"></span></p>
+						<p class="movie-details-long-text"><strong>DVD:</strong> <span id="movie-details-dvd"></span></p>
+						<p class="movie-details-long-text"><strong>Box Office:</strong> <span id="movie-details-boxoffice"></span></p>
+						<p class="movie-details-long-text"><strong>Production:</strong> <span id="movie-details-production"></span></p>
+						<p class="movie-details-long-text"><strong>Language:</strong> <span id="movie-details-language"></span></p>
+						<p class="movie-details-long-text"><strong>Country:</strong> <span id="movie-details-country"></span></p>
+						<p class="movie-details-long-text"><strong>Awards:</strong> <span id="movie-details-awards"></span></p>
+					</div>
+				</div>
+				<div id="movie-details-buttons-container" class="field">
+				  <p class="control">
+				    <button id="add-to-favorites-button" class="button is-success">
+				      Add to Favorites
+				    </button>
+					<button id="login-cancel" class="button close-modal-button">Close</button>
+				  </p>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<div id="not-logged-in-modal" class="modal">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+				<p class="modal-card-title">Signup or Login</p>
+				<button class="delete close-modal-button" aria-label="close"></button>
+			</header>
+			<section class="modal-card-body">
+				<div id="not-logged-in-text-container">
+					<p id="not-logged-in-text">In order to add favorite movies, you must login or create an account.</p>
+				</div>
+				<div class="field">
+				  <p class="control">
+				    <button class="button is-success open-modal-button close-modal-button" data-modal-type="signup-modal">
+				      Signup
+				    </button>
+				    <button class="button is-info open-modal-button close-modal-button" data-modal-type="login-modal">
+				      Login
+				    </button>
+					<button id="login-cancel" class="button close-modal-button">Close</button>
+				  </p>
+				</div>
 			</section>
 		</div>
 	</div>

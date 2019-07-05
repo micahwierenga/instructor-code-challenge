@@ -85,12 +85,13 @@ function loginUser(req, res) {
            console.log(isMatch)
            if (isMatch === true) {
               res.send({
-                 token: auth.createJWT(user)
+                 token: auth.createJWT(user),
+                 user: user
               });
             }
             else if (isMatch === false) {
               console.log("invalid passwoooorrrrddd");
-              res.send({ message: 'invalid pword'});
+              res.send({ message: 'Invalid password'});
             }
            
         });

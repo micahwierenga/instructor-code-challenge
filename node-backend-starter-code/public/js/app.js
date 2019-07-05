@@ -1,69 +1,111 @@
-let signupButton = document.getElementById('signup-btn');
-signupButton.addEventListener('click', openSignupModal);
-
-let signupClose = document.getElementById('signup-close');
-signupClose.addEventListener('click', closeSignupModal);
-
-let signupCancel = document.getElementById('signup-cancel');
-signupCancel.addEventListener('click', closeSignupModal);
-
-function openSignupModal() {
-  let signupModal = document.getElementById('signup-modal');
-  signupModal.classList.add('is-active');
+// Handle opening and closing of modals
+let closeModalButtons = document.getElementsByClassName('close-modal-button');
+for(let i = 0; i < closeModalButtons.length; i++) {
+  closeModalButtons[i].addEventListener('click', function(event) {
+    let modal = this.closest('.modal');
+    modal.classList.remove('is-active');
+  })
 }
 
-function closeSignupModal() {
-  let signupModal = document.getElementById('signup-modal');
-  signupModal.classList.remove('is-active');
+let openModalButtons = document.getElementsByClassName('open-modal-button');
+for(let i = 0; i < openModalButtons.length; i++) {
+  openModalButtons[i].addEventListener('click', function(event) {
+    let modalType = this.getAttribute('data-modal-type');
+    document.getElementById(modalType).classList.add('is-active');
+  })
 }
 
-let loginButton = document.getElementById('login-btn');
-loginButton.addEventListener('click', openLoginModal);
-
-let loginClose = document.getElementById('login-close');
-loginClose.addEventListener('click', closeLoginModal);
-
-let loginCancel = document.getElementById('login-cancel');
-loginCancel.addEventListener('click', closeLoginModal);
-
-function openLoginModal() {
-  let loginModal = document.getElementById('login-modal');
-  loginModal.classList.add('is-active');
+function closeModal(modalId) {
+  let modal = document.getElementById(modalId);
+  modal.classList.remove('is-active');
 }
 
-function closeLoginModal() {
-  let loginModal = document.getElementById('login-modal');
-  loginModal.classList.remove('is-active');
+function openModal(modalId) {
+  let modal = document.getElementById(modalId);
+  modal.classList.add('is-active');
 }
 
-function loginUser() {
-  let formEmail = document.getElementById('login-form-email').value;
-  let formPassword = document.getElementById('login-form-password').value;
-  let http = new XMLHttpRequest();
-  let url = "/loginUser";
-  let params = "email=" + formEmail + "&password=" + formPassword;
-  console.log('params: ', params);
-  http.open('POST', url, true);
-
-  http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-  http.onreadystatechange = function() {
-    if(http.readyState == 4 && http.status == 200) {
-      alert(http.responseText);
-    }
+// Signup
+let signupSubmitButton = document.getElementById('signup-submit');
+signupSubmitButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  let formUsername = document.getElementById('signup-username').value;
+  let formEmail = document.getElementById('signup-email').value;
+  let formPassword = document.getElementById('signup-password').value;
+  let url = "/api/users";
+  let newUserData = {
+    username: formUsername,
+    email: formEmail,
+    password: formPassword
   }
+  fetch(url, {
+    method: 'POST',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newUserData),
+  })
+  .then(res => res.json())
+  .then(response => {
+    setSessionStorage('user_id', response.user.id)
+    setSessionStorage('token', response.token)
+    setUserName(response.user.id)
+    handleLoginAndLogout()
+  })
+  .catch(error => console.error('Error: ', error));
 
-  http.send(params);
+  closeModal('signup-modal');
+});
 
-  setSessionStorage('loggedIn', 'true');
-  isLoggedIn(true);
-}
+// Login
+let loginSubmitButton = document.getElementById('login-submit');
+loginSubmitButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  let formEmail = document.getElementById('login-email').value;
+  let formPassword = document.getElementById('login-password').value;
+  let url = "/loginUser";
+  let loginUserData = {
+    email: formEmail,
+    password: formPassword
+  }
+  fetch(url, {
+    method: 'POST',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(loginUserData),
+  })
+  .then(res => res.json())
+  .then(response => {
+    if(response['message']) {
+      document.getElementById('invalid-login-message').innerHTML = response['message'];
+      document.getElementById('login-password').classList.add('is-danger');
+    } else {
+      setSessionStorage('user_id', response.user.id)
+      setSessionStorage('token', response.token)
+      setUserName(response.user.id)
+      handleLoginAndLogout()
+      closeModal('login-modal');
+    }
+  })
+  .catch(error => {
+    console.error('Error: ', error)
+  });
+});
 
-function logout() {
-  removeSessionStorage('user_id');
-  isLoggedIn(false);
-}
+// Logout
+let logoutButton = document.getElementById('logout-btn');
+logoutButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  sessionStorage.clear();
+  handleLoginAndLogout();
+})
 
+// Handle session storage
 function setSessionStorage(key, value) {
   sessionStorage.setItem(key, value);
 }
@@ -72,12 +114,19 @@ function removeSessionStorage(key) {
   sessionStorage.removeItem(key);
 }
 
-function isLoggedIn(loggedIn) {
+// Check if user is logged in based on session storage
+function isLoggedIn() {
+  return (sessionStorage && sessionStorage.user_id) ? true : false;
+}
+
+// Handle elements/actions based on logged in status
+function handleLoginAndLogout() {
   let signupDiv = document.getElementById('signup-div');
   let loginDiv = document.getElementById('login-div');
   let logoutDiv = document.getElementById('logout-div');
   let usernameDiv = document.getElementById('username-div');
-  if(loggedIn || sessionStorage.user_id) {
+  let loggedIn = isLoggedIn();
+  if(loggedIn) {
     signupDiv.classList.add('hide');
     loginDiv.classList.add('hide');
     logoutDiv.classList.remove('hide');
@@ -86,54 +135,124 @@ function isLoggedIn(loggedIn) {
       setUserName(sessionStorage.user_id);
     }
   } else {
-    console.log('is NOT logged in');
     signupDiv.classList.remove('hide');
     loginDiv.classList.remove('hide');
     logoutDiv.classList.add('hide');
     usernameDiv.classList.add('hide');
+    setUserName();
   }
 }
 
-isLoggedIn();
+handleLoginAndLogout();
 
-function getMovies() {
-  let http = new XMLHttpRequest();
-  let url = encodeURIComponent("http://www.omdbapi.com/?");
-  let params = encodeURIComponent("apikey=68a131f1&t=star wars");
-  console.log('params: ', params);
-  http.open('GET', url + params);
-
-  http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-  http.onreadystatechange = function() {
-    if(http.readyState == 4 && http.status == 200) {
-      console.log(http.responseText);
-    }
+// Set username in upper-right corner if user is logged in
+function setUserName(id) {
+  let user_id = sessionStorage.user_id ? sessionStorage.user_id : id;
+  if(user_id) {
+    fetch('/api/users/' + user_id)
+    .then(res => res.json())
+    .then(response => {
+      document.getElementById('username-display').innerHTML = response.username;
+    })
+    .catch(error => console.error('Error: ', error));
+  } else {
+    document.getElementById('username-display').innerHTML = '';
   }
-
-  http.send();
 }
 
+// Movie search by title
 let movieSearchButton = document.getElementById('movie-search-button');
 movieSearchButton.addEventListener('click', function(event) {
   event.preventDefault();
   let title = encodeURIComponent(document.getElementById('movie-search-input').value);
-  console.log('title: ', title);
   fetch('/api/searchMovies/?title=' + title)
   .then(res => res.json())
   .then(response => {
-    console.log('Success movie: ', response);
-    let movieList = '';
-    for(let i = 0; i < response.length; i++) {
-      let odd = (i % 2 == 0) ? '' : ' movie-result-item-odd';
-      movieList += '<p class="movie-result-item' + odd + '">' + response[i].Title + '</p>';
+    if(response['message']) {
+      document.getElementById('movie-results-list').innerHTML = '<p id="movie-results-no-results" class="has-text-danger">' + response['message'] + '</p>';
+    } else {
+      prepareMovieList(response);
     }
-    document.getElementById('movie-results-list').innerHTML = movieList;
   })
   .catch(error => console.error('Error: ', error));
+
+  document.getElementById('movie-search-input').value = '';
 });
 
-// getMovies();
+// Create movie list from movie search
+function prepareMovieList(movies) {
+  let movieList = '<h2 id="movie-result-header">Results</h2>';
+  for(let i = 0; i < movies.length; i++) {
+    let odd = (i % 2 == 0) ? '' : ' movie-result-item-odd';
+    movieList += '<p class="movie-result-item' + odd + '"><span class="movie-results-title">' + movies[i].Title + '</span><a class="button is-success details-button open-modal-button" data-movie-id="' + movies[i].imdbID + '" data-modal-type="movie-details-modal">Details</a></p>';
+  }
+  document.getElementById('movie-results-list').innerHTML = movieList;
+
+  // Movie details button functionality
+  let detailsButton = document.getElementsByClassName('details-button');
+  for(let i = 0; i < detailsButton.length; i++) {
+    detailsButton[i].addEventListener('click', function(event) {
+      let movieId = this.getAttribute('data-movie-id');
+      fetch('/api/searchMovies/' + movieId)
+      .then(res => res.json())
+      .then(response => {
+        prepareMovieDetails(response);
+      })
+      .catch(error => console.error('Error: ', error));
+      document.getElementById('movie-details-modal').classList.add('is-active');
+    })
+  }
+}
+
+// Get movie details when Details button is clicked
+function prepareMovieDetails(movieDetails) {
+  let keys = Object.keys(movieDetails);
+  for(let i = 0; i < keys.length; i++) {
+    let lowerKey = keys[i].toLowerCase();
+    let element = document.getElementById('movie-details-' + lowerKey);
+    if(element) {
+      element.innerHTML = movieDetails[keys[i]];
+    }
+  }
+  document.getElementById('movie-details-image-container').innerHTML = '<img src="' + movieDetails.Poster + '" id="movie-details-image">';
+  let ratingsList = '';
+  for(let i = 0; i < movieDetails.Ratings.length; i++) {
+    ratingsList += '<li>&nbsp;&nbsp;&nbsp;<em>' + movieDetails.Ratings[i].Source + ':</em> ' + movieDetails.Ratings[i].Value + '</li>';
+  }
+  document.getElementById('movie-details-ratings-list').innerHTML = ratingsList;
+}
+
+let addToFavoritesButton = document.getElementById('add-to-favorites-button');
+addToFavoritesButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  let loggedIn = isLoggedIn();
+  if(!loggedIn) {
+    openModal('not-logged-in-modal');
+    closeModal('movie-details-modal');
+  } else {
+    let movie_id = document.getElementById('movie-details-imdbid').innerHTML;
+    let user_id = sessionStorage.user_id;
+    let url = "/api/favorites";
+    let newFavoriteMovieData = {
+      favorite_movie_id: movie_id,
+      user_id: user_id
+    }
+    fetch(url, {
+      method: 'POST',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newFavoriteMovieData),
+    })
+    .then(res => res.json())
+    .then(response => {
+      console.log('Success: ', response);
+    })
+    .catch(error => console.error('Error: ', error));
+  }
+}); 
 
 function createFavoriteMovie() {
   let formMovieId = 'tt0120338';
@@ -159,66 +278,3 @@ function createFavoriteMovie() {
   .then(response => console.log('Success: ', response))
   .catch(error => console.error('Error: ', error));
 }
-
-let signupForm = document.getElementById('signup-form');
-signupForm.addEventListener('submit', function(event) {
-  event.preventDefault();
-  let formUsername = document.getElementById('signup-username').value;
-  let formEmail = document.getElementById('signup-email').value;
-  let formPassword = document.getElementById('signup-password').value;
-  let url = "/api/users";
-  let newUserData = {
-    username: formUsername,
-    email: formEmail,
-    password: formPassword
-  }
-  fetch(url, {
-    method: 'POST',
-    cache: 'no-cache',
-    credentials: 'same-origin',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newUserData),
-  })
-  .then(res => res.json())
-  .then(response => {
-    setSessionStorage('user_id', response.user.id)
-    setUserName(response.user.id)
-    isLoggedIn(true)
-  })
-  .catch(error => console.error('Error: ', error));
-
-  closeSignupModal();
-});
-
-function setUserName(id) {
-  let user_id = sessionStorage.user_id ? sessionStorage.user_id : id;
-  if(user_id) {
-    fetch('/api/users/' + user_id)
-    .then(res => res.json())
-    .then(response => {
-      document.getElementById('username-display').innerHTML = response.username;
-    })
-    .catch(error => console.error('Error: ', error));
-  }
-}
-
-function getUsers() {
-  // const xhr = new XMLHttpRequest();
-
-  // xhr.onload = function() {
-  //   if(xhr.readyState == 4 && xhr.status == 200) {
-  //     console.log(this.responseText);
-  //   }
-  // }
-
-  // xhr.open('get', '/api/users');
-  // xhr.send();
-  fetch('/api/users')
-  .then(res => res.json())
-  .then(response => console.log('Success: ', response))
-  .catch(error => console.error('Error: ', error));
-}
-
-// getUsers();

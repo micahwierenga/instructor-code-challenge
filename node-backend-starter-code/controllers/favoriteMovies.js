@@ -2,15 +2,28 @@ const request = require('request');
 const db = require('../models');
 const FavoriteMovie = db.models.FavoriteMovie;
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
+const omdbUrl = "http://www.omdbapi.com/?apikey=" + OMDB_API_KEY;
 
 function search(req, res) {
-	let url = "http://www.omdbapi.com/?apikey=" + OMDB_API_KEY + "&s=" + req.query.title;
+	let url = omdbUrl + "&s=" + req.query.title;
 	request(url, function(err, response, body) {
 		console.log('movies: ', JSON.parse(body).Search);
 	    let movies = JSON.parse(body).Search;
-	    res.json(movies);
+	    if(!movies) {
+	    	res.json({message: 'No results found'});
+	    } else {
+	    	res.json(movies);
+	    }
 	})
 }
+
+function searchOne(req, res) {
+	let url = omdbUrl + "&i=" + req.params.id;
+	request(url, function(err, response, body) {
+		console.log('DETAILS: ', JSON.parse(body));
+	    res.json(JSON.parse(body));
+	})
+};
 
 function index(req, res) {
 	console.log('Yippee index');
@@ -63,6 +76,7 @@ function destroy(req, res) {
 }
 
 module.exports.search = search;
+module.exports.searchOne = searchOne;
 module.exports.index = index;
 module.exports.show = show;
 module.exports.create = create;

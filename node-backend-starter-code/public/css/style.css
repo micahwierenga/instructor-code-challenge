@@ -20,16 +20,47 @@ a {
 	color: #3273dc;
 }
 
+#invalid-login-message-container {
+	margin-bottom: 12px;
+}
+
 #movie-search-container-div {
 	display: flex;
 	justify-content: center;
 	padding: 40px 25%;
 }
 
+#movie-results-no-results {
+	font-size: 18px;
+}
+
 #movie-results-container-div {
 	display: flex;
     justify-content: center;
     padding: 40px 25%;
+}
+
+#movie-result-header {
+	font-size: 24px;
+    font-weight: 600;
+    border-bottom: 3px solid black;
+}
+
+#movie-details-image-container {
+	float: left;
+	margin: 15px;
+}
+
+#movie-details-long-text-container {
+	clear: both;
+}
+
+#movie-details-buttons-container {
+	margin-top: 20px;
+}
+
+#not-logged-in-text {
+	margin-bottom: 25px;
 }
 
 .header {
@@ -58,10 +89,23 @@ a {
 .movie-result-item {
 	font-size: 18px;
 	line-height: 1.5;
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
 }
 
 .movie-result-item-odd {
 	background: #dddddd;
+}
+
+.movie-results-title {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.details-button {
+	margin-left: 20px;
 }
 
 input.input.is-medium {
