@@ -28,7 +28,7 @@
 				<button id="signup-close" class="delete" aria-label="close"></button>
 			</header>
 			<section class="modal-card-body">
-				<form id="signup-form" onsubmit="createNewUser()">
+				<form id="signup-form">
 					<div class="field">
 					  <p class="control has-icons-left has-icons-right">
 					    <input id="signup-username" class="input" type="username" placeholder="Username">
@@ -61,7 +61,7 @@
 					</div>
 					<div class="field">
 					  <p class="control">
-					    <button class="button is-success">
+					    <button type="submit" id="signup-submit" class="button is-success">
 					      Sign Up
 					    </button>
 						<button id="signup-cancel" class="button">Cancel</button>

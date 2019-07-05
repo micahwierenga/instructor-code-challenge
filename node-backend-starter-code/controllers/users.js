@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
 const auth = require('../auth');
 const db = require('../models');
 const User = db.models.User;
@@ -22,31 +21,18 @@ function show(req, res) {
 };
 
 function create(req, res) {
-	console.log('req: ', req.body);
-	console.log('Yippee create user');
-	console.log('POST auth/signup password', req.body.email);
 	bcrypt.genSalt(10, function(err, salt) {
 	   bcrypt.hash(req.body.password, salt, function(err, hash) {
 	      req.body.password = hash;
-	      console.log('hashed', req.body.password);
-	      console.log(req.body.password);
 
 	      User.create(req.body)
 	         .then(function(user) {
 	            if (!user) return error(res, "not saved");
-	            console.log("Here are the user.dataValues: " + user);
 	            auth.createJWT(user);
-	            console.log("Here is the user " + user);
-	            // res.setHeader("Access-Control-Allow-Origin", "*");
-	            // res.setHeader(
-	            //   "Access-Control-Allow-Methods",
-	            //   "OPTIONS, GET, POST, PUT, PATCH, DELETE" // what matters here is that OPTIONS is present
-	            // );
-	            // res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization", "Access-Control-Allow-Origin");
 	            res.json({
-	               token: auth.createJWT(user),
-	               user: user
-	            })
+	            	token: auth.createJWT(user),
+	                user: user
+	            });
 	         })
 	   });
 	});
@@ -112,59 +98,9 @@ function loginUser(req, res) {
   });
 }
 
-//Controllers for signing up and loggin in/out
-function getSignup(req, res) {
-	res.render('signup.ejs', { message: req.flash('signupMessage') });
-};
-
-function postSignup(req, res) {
-	var signupStrategy = passport.authenticate('local-signup', {
-		successRedirect: '/',
-		failureRedirect: '/',
-		failureFlash: true
-	});
-	return signupStrategy(req, res);
-};
-
-function getLogin(req, res) {
-	res.render('login.ejs', { message: req.flash('loginMessage') });
-};
-
-function postLogin(req, res) {
-	var loginStrategy = passport.authenticate('local-login', {
-		successRedirect: '/',
-		failureRedirect: '/',
-		failureFlash: true
-	});
-	return loginStrategy(req, res);
-};
-
-function getLogout(req, res) {
-	req.logout();
-	res.redirect('/');
-};
-
-function secret(req, res) {
-	res.render('secret.ejs', { secretMessage: "Hey" });
-	res.send( {secretMessage: "Hey" });
-
-	var secretStrategy = passport.authenticate('local-secret', {
-		successRedirect: '/secret',
-		failureRedirect: '/',
-		failureFlash: true
-	});
-	return secretStrategy(req, res);
-};
-
 module.exports.index = index;
 module.exports.show = show;
 module.exports.create = create;
 module.exports.update = update;
 module.exports.destroy = destroy;
 module.exports.loginUser = loginUser;
-module.exports.getLogin = getLogin;
-module.exports.postLogin = postLogin;
-module.exports.getSignup = getSignup;
-module.exports.postSignup = postSignup;
-module.exports.getLogout = getLogout;
-module.exports.secret = secret;

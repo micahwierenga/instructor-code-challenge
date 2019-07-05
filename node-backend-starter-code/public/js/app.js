@@ -37,45 +37,19 @@ function closeLoginModal() {
 }
 
 function createNewUser() {
-  let formUsername = document.getElementById('signup-username').value;
-  let formEmail = document.getElementById('signup-email').value;
-  let formPassword = document.getElementById('signup-password').value;
-  let url = "http://localhost:3000/signup";
-  let params = "username=" + formUsername + "&email=" + formEmail + "&password=" + formPassword;
+  // let formUsername = document.getElementById('signup-username').value;
+  // let formEmail = document.getElementById('signup-email').value;
+  // let formPassword = document.getElementById('signup-password').value;
+  let formUsername = 'sam';
+  let formEmail = 'sam@sam.com';
+  let formPassword = 'sam';
+  let url = "/api/users";
+  // let params = "user_id=" + formUserId + "&favorite_movie_id=" + formMovieId;
   let newUserData = {
     username: formUsername,
     email: formEmail,
     password: formPassword
   }
-
-
-
-  // http.onreadystatechange = function() {
-  //   if(http.readyState == 4 && http.status == 200) {
-  //     console.log('response.text: ', http.responseText);
-  //   }
-  // }
-  // http.onload = function () {
-  //   console.log('this: ', this);
-
-  //   // Process our return data
-  //   if (http.status >= 200 && http.status < 300) {
-  //     // What do when the request is successful
-  //     console.log('success!', http);
-  //     console.log('response.text: ', http.responseText);
-  //   } else {
-  //     // What do when the request fails
-  //     console.log('The request failed!');
-  //   }
-
-  //   // Code that should run regardless of the request status
-  //   console.log('This always runs...');
-  // };
-  // http.open('POST', url, true);
-  // http.send(params);
-  // console.log('response.text fuck: ', http.responseText);
-
-
   fetch(url, {
     method: 'POST',
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -90,22 +64,6 @@ function createNewUser() {
   .then(res => res.json())
   .then(response => console.log('Success: ', response))
   .catch(error => console.error('Error: ', error));
-
-
-  // postRequest('/api/users', newUserData)
-  // .then(data => console.log(data)) // Result from the `response.json()` call
-  // .catch(error => console.error(error))
-  // const xhr = new XMLHttpRequest();
-
-  // xhr.onload = function() {
-  //   // if(xhr.readyState == 4 && xhr.status == 200) {
-  //     console.log(this.responseText);
-  //   // }
-  // }
-
-  // xhr.open('POST', '/api/users');
-  // xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  // xhr.send(params);
 
   closeSignupModal();
 
@@ -199,6 +157,61 @@ function getMovies() {
 
 // getMovies();
 
+function createFavoriteMovie() {
+  let formMovieId = 'tt0120338';
+  let formUserId = 1;
+  let url = "/api/favorites";
+  // let params = "user_id=" + formUserId + "&favorite_movie_id=" + formMovieId;
+  let newFavoriteMovieData = {
+    favorite_movie_id: formMovieId,
+    user_id: formUserId
+  }
+  fetch(url, {
+    method: 'POST',
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded'
+        // "Access-Control-Origin": "*"
+    },
+    body: JSON.stringify(newFavoriteMovieData),
+  })
+  .then(res => res.json())
+  .then(response => console.log('Success: ', response))
+  .catch(error => console.error('Error: ', error));
+}
+
+let signupForm = document.getElementById('signup-form');
+signupForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+  let formUsername = document.getElementById('signup-username').value;
+  let formEmail = document.getElementById('signup-email').value;
+  let formPassword = document.getElementById('signup-password').value;
+  let url = "/api/users";
+  let newUserData = {
+    username: formUsername,
+    email: formEmail,
+    password: formPassword
+  }
+  fetch(url, {
+    method: 'POST',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newUserData),
+  })
+  .then(res => res.json())
+  .then(response => console.log('Success: ', response))
+  .catch(error => console.error('Error: ', error));
+
+  closeSignupModal();
+});
+
+// createNewUserTest();
+
 function getUsers() {
   // const xhr = new XMLHttpRequest();
 
@@ -216,4 +229,4 @@ function getUsers() {
   .catch(error => console.error('Error: ', error));
 }
 
-getUsers();
+// getUsers();

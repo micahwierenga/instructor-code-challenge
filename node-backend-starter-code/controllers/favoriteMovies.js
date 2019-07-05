@@ -1,9 +1,9 @@
 const db = require('../models');
-const FavoriteMove = db.models.FavoriteMove;
+const FavoriteMovie = db.models.FavoriteMovie;
 
 function index(req, res) {
 	console.log('Yippee index');
-	FavoriteMove.findAll()
+	FavoriteMovie.findAll()
 	    .then(function(favoriteMovies) {
 	    	res.json(favoriteMovies);
 	    });
@@ -11,7 +11,7 @@ function index(req, res) {
 
 function show(req, res) {
 	console.log('Yippee show');
-	FavoriteMove.findById(req.params.id)
+	FavoriteMovie.findById(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	console.log(favoriteMovie);
 	    	res.json(favoriteMovie);
@@ -20,16 +20,17 @@ function show(req, res) {
 
 function create(req, res) {
 	console.log('Yippee create favorite');
-	FavoriteMove.create(req.body)
-	    .then(function(newFavoriteMove) {
-	    	console.log(newFavoriteMove);
-	    	res.json(newFavoriteMove);
+	console.log('req.body: ', req.body);
+	FavoriteMovie.create(req.body)
+	    .then(function(newFavoriteMovie) {
+	    	console.log(newFavoriteMovie);
+	    	res.json(newFavoriteMovie);
 	    });
 };
 
 function update(req, res) {
 	console.log('Yippee update');
-	FavoriteMove.findById(req.params.id)
+	FavoriteMovie.findById(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.updateAttributes(req.body);
 	    })
@@ -41,7 +42,7 @@ function update(req, res) {
 function destroy(req, res) {
 	console.log("here is the req.params.id" + req.params.id);
 	console.log('Yippee destroy');
-	FavoriteMove.findById(req.params.id)
+	FavoriteMovie.findById(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.destroy();
 	    })

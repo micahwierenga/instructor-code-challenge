@@ -4,8 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
-const flash = require('connect-flash');
 const auth = require('./auth');
 const router = require('./routes/routes.js');
 
@@ -17,20 +15,6 @@ let User = db.models.User;
 let FavoriteMovie = db.models.FavoriteMovie;
 
 app.use('/', express.static(path.join(__dirname, 'public')));
-
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
-
-require('./config/passport')(passport);
-
-
-app.use(function(req, res, next) {
-  res.locals.currentUser = req.user;
-  currentSessionUser = res.locals.currentUser;
-  console.log('currentSessionUser: ', currentSessionUser);
-  next();
-});
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
