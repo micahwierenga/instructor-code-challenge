@@ -8,10 +8,43 @@ a {
 	text-decoration: none;
 }
 
+#username-div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#username-div #username-display {
+	font-size: 20px;
+    font-weight: bold;
+	color: #3273dc;
+}
+
+#movie-search-container-div {
+	display: flex;
+	justify-content: center;
+	padding: 40px 25%;
+}
+
+#movie-results-container-div {
+	display: flex;
+    justify-content: center;
+    padding: 40px 25%;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	margin: 20px;
+}
+
+.header-heading {
+	font-size: 28px;
+}
+
 .nav {
 	display: flex;
 	justify-content: flex-end;
-	margin: 15px;
 }
 
 .nav-item {
@@ -20,4 +53,17 @@ a {
 
 .hide {
 	display: none;
+}
+
+.movie-result-item {
+	font-size: 18px;
+	line-height: 1.5;
+}
+
+.movie-result-item-odd {
+	background: #dddddd;
+}
+
+input.input.is-medium {
+	width: 400px;
 }

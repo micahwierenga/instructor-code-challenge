@@ -24,7 +24,10 @@ router.delete('/api/users/:id', usersController.destroy);
 router.post('/loginUser', usersController.loginUser);
 
 
-// Resort Routes
+// Movies Routes
+
+// search
+router.get('/api/searchMovies/', favoriteMoviesController.search);
 
 // index
 router.get('/api/favorites', favoriteMoviesController.index);

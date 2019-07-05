@@ -1,5 +1,16 @@
+const request = require('request');
 const db = require('../models');
 const FavoriteMovie = db.models.FavoriteMovie;
+const OMDB_API_KEY = process.env.OMDB_API_KEY;
+
+function search(req, res) {
+	let url = "http://www.omdbapi.com/?apikey=" + OMDB_API_KEY + "&s=" + req.query.title;
+	request(url, function(err, response, body) {
+		console.log('movies: ', JSON.parse(body).Search);
+	    let movies = JSON.parse(body).Search;
+	    res.json(movies);
+	})
+}
 
 function index(req, res) {
 	console.log('Yippee index');
@@ -11,7 +22,7 @@ function index(req, res) {
 
 function show(req, res) {
 	console.log('Yippee show');
-	FavoriteMovie.findById(req.params.id)
+	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	console.log(favoriteMovie);
 	    	res.json(favoriteMovie);
@@ -30,7 +41,7 @@ function create(req, res) {
 
 function update(req, res) {
 	console.log('Yippee update');
-	FavoriteMovie.findById(req.params.id)
+	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.updateAttributes(req.body);
 	    })
@@ -42,7 +53,7 @@ function update(req, res) {
 function destroy(req, res) {
 	console.log("here is the req.params.id" + req.params.id);
 	console.log('Yippee destroy');
-	FavoriteMovie.findById(req.params.id)
+	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.destroy();
 	    })
@@ -51,6 +62,7 @@ function destroy(req, res) {
 	    });
 }
 
+module.exports.search = search;
 module.exports.index = index;
 module.exports.show = show;
 module.exports.create = create;

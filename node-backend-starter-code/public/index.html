@@ -2,21 +2,46 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Movie Search Home</title>
+	<title>Save Ur Fave</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
 	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-	<div class="nav">
-		<div id="logout-div" class="nav-item hide">
-			<button id="logout-btn" class="button is-link nav-button">LOGOUT</button>
+	<div class="header">
+		<div>
+			<p class="header-heading"><strong>SAVE</strong>UR<strong>FAVE</strong></p>
 		</div>
-		<div id="signup-div" class="nav-item">
-			<button id="signup-btn" class="button nav-button">SIGNUP</button>
+		<div class="nav">
+			<div id="username-div" class="nav-item hide">
+				<p id="username-display"></p>
+			</div>
+			<div id="logout-div" class="nav-item hide">
+				<button id="logout-btn" class="button is-link nav-button">LOGOUT</button>
+			</div>
+			<div id="signup-div" class="nav-item">
+				<button id="signup-btn" class="button nav-button">SIGNUP</button>
+			</div>
+			<div id="login-div" class="nav-item">
+				<button id="login-btn" class="button is-link nav-button">LOGIN</button>
+			</div>
 		</div>
-		<div id="login-div" class="nav-item">
-			<button id="login-btn" class="button is-link nav-button">LOGIN</button>
+	</div>
+	<div id="movie-search-container-div">
+		<div class="field is-grouped">
+		  <p class="control is-expanded">
+		    <input id="movie-search-input" class="input is-medium" type="text" placeholder="Search for movie title">
+		  </p>
+		  <p class="control">
+		    <a id="movie-search-button" class="button is-info is-medium">
+		      Search
+		    </a>
+		  </p>
+		</div>
+	</div>
+
+	<div id="movie-results-container-div">
+		<div id="movie-results-list">
 		</div>
 	</div>
 

@@ -13,7 +13,8 @@ function index(req, res) {
 
 function show(req, res) {
 	console.log('Yippee show');
-	User.findById(req.params.id)
+	console.log('params.id: ', req.params.id);
+	User.findByPk(req.params.id)
 	    .then(function(user) {
 	    	console.log(user);
 	    	res.json(user);
@@ -40,7 +41,7 @@ function create(req, res) {
 
 function update(req, res) {
 	console.log('Yippee update');
-	User.findById(req.params.id)
+	User.findByPk(req.params.id)
 	    .then(function(user) {
 	    	return user.updateAttributes(req.body);
 	    })
@@ -52,7 +53,7 @@ function update(req, res) {
 function destroy(req, res) {
 	console.log("here is the req.params.id" + req.params.id);
 	console.log('Yippee destroy');
-	User.findById(req.params.id)
+	User.findByPk(req.params.id)
 	    .then(function(user) {
 	    	return user.destroy();
 	    })

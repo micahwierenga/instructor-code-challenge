@@ -36,53 +36,6 @@ function closeLoginModal() {
   loginModal.classList.remove('is-active');
 }
 
-function createNewUser() {
-  // let formUsername = document.getElementById('signup-username').value;
-  // let formEmail = document.getElementById('signup-email').value;
-  // let formPassword = document.getElementById('signup-password').value;
-  let formUsername = 'sam';
-  let formEmail = 'sam@sam.com';
-  let formPassword = 'sam';
-  let url = "/api/users";
-  // let params = "user_id=" + formUserId + "&favorite_movie_id=" + formMovieId;
-  let newUserData = {
-    username: formUsername,
-    email: formEmail,
-    password: formPassword
-  }
-  fetch(url, {
-    method: 'POST',
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, *same-origin, omit
-    headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded'
-        // "Access-Control-Origin": "*"
-    },
-    body: JSON.stringify(newUserData),
-  })
-  .then(res => res.json())
-  .then(response => console.log('Success: ', response))
-  .catch(error => console.error('Error: ', error));
-
-  closeSignupModal();
-
-  // setSessionStorage('loggedIn', 'true');
-  // isLoggedIn(true);
-}
-
-function postRequest(url, data) {
-  return fetch(url, {
-    credentials: 'include', // 'include', default: 'omit'
-    method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
-    body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
-    headers: new Headers({
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }),
-  })
-  .then(response => response.json())
-}
-
 function loginUser() {
   let formEmail = document.getElementById('login-form-email').value;
   let formPassword = document.getElementById('login-form-password').value;
@@ -107,7 +60,7 @@ function loginUser() {
 }
 
 function logout() {
-  removeSessionStorage('loggedIn');
+  removeSessionStorage('user_id');
   isLoggedIn(false);
 }
 
@@ -123,15 +76,21 @@ function isLoggedIn(loggedIn) {
   let signupDiv = document.getElementById('signup-div');
   let loginDiv = document.getElementById('login-div');
   let logoutDiv = document.getElementById('logout-div');
-  if(loggedIn || sessionStorage.loggedIn) {
+  let usernameDiv = document.getElementById('username-div');
+  if(loggedIn || sessionStorage.user_id) {
     signupDiv.classList.add('hide');
     loginDiv.classList.add('hide');
     logoutDiv.classList.remove('hide');
+    usernameDiv.classList.remove('hide');
+    if(sessionStorage.user_id) {
+      setUserName(sessionStorage.user_id);
+    }
   } else {
     console.log('is NOT logged in');
     signupDiv.classList.remove('hide');
     loginDiv.classList.remove('hide');
     logoutDiv.classList.add('hide');
+    usernameDiv.classList.add('hide');
   }
 }
 
@@ -154,6 +113,25 @@ function getMovies() {
 
   http.send();
 }
+
+let movieSearchButton = document.getElementById('movie-search-button');
+movieSearchButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  let title = encodeURIComponent(document.getElementById('movie-search-input').value);
+  console.log('title: ', title);
+  fetch('/api/searchMovies/?title=' + title)
+  .then(res => res.json())
+  .then(response => {
+    console.log('Success movie: ', response);
+    let movieList = '';
+    for(let i = 0; i < response.length; i++) {
+      let odd = (i % 2 == 0) ? '' : ' movie-result-item-odd';
+      movieList += '<p class="movie-result-item' + odd + '">' + response[i].Title + '</p>';
+    }
+    document.getElementById('movie-results-list').innerHTML = movieList;
+  })
+  .catch(error => console.error('Error: ', error));
+});
 
 // getMovies();
 
@@ -204,13 +182,27 @@ signupForm.addEventListener('submit', function(event) {
     body: JSON.stringify(newUserData),
   })
   .then(res => res.json())
-  .then(response => console.log('Success: ', response))
+  .then(response => {
+    setSessionStorage('user_id', response.user.id)
+    setUserName(response.user.id)
+    isLoggedIn(true)
+  })
   .catch(error => console.error('Error: ', error));
 
   closeSignupModal();
 });
 
-// createNewUserTest();
+function setUserName(id) {
+  let user_id = sessionStorage.user_id ? sessionStorage.user_id : id;
+  if(user_id) {
+    fetch('/api/users/' + user_id)
+    .then(res => res.json())
+    .then(response => {
+      document.getElementById('username-display').innerHTML = response.username;
+    })
+    .catch(error => console.error('Error: ', error));
+  }
+}
 
 function getUsers() {
   // const xhr = new XMLHttpRequest();
