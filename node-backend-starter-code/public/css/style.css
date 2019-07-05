@@ -104,6 +104,10 @@ a {
 	justify-content: center;
 }
 
+.movie-details-button-container {
+	display: inline-block;
+}
+
 .details-button {
 	margin-left: 20px;
 }

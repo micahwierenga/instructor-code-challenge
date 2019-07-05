@@ -32,6 +32,9 @@ router.get('/api/searchMovies/', favoriteMoviesController.search);
 // search show
 router.get('/api/searchMovies/:id', favoriteMoviesController.searchOne);
 
+// find favorite by user id and movie id
+router.get('/api/favorites/:user_id/:favorite_movie_id', favoriteMoviesController.findByMovieIdAndUserId);
+
 // index
 router.get('/api/favorites', favoriteMoviesController.index);
 

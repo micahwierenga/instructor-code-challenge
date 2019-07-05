@@ -32,7 +32,7 @@ signupSubmitButton.addEventListener('click', function(event) {
   let formUsername = document.getElementById('signup-username').value;
   let formEmail = document.getElementById('signup-email').value;
   let formPassword = document.getElementById('signup-password').value;
-  let url = "/api/users";
+  let url = "/api/users/";
   let newUserData = {
     username: formUsername,
     email: formEmail,
@@ -65,7 +65,7 @@ loginSubmitButton.addEventListener('click', function(event) {
   event.preventDefault();
   let formEmail = document.getElementById('login-email').value;
   let formPassword = document.getElementById('login-password').value;
-  let url = "/loginUser";
+  let url = "/loginUser/";
   let loginUserData = {
     email: formEmail,
     password: formPassword
@@ -220,61 +220,79 @@ function prepareMovieDetails(movieDetails) {
     ratingsList += '<li>&nbsp;&nbsp;&nbsp;<em>' + movieDetails.Ratings[i].Source + ':</em> ' + movieDetails.Ratings[i].Value + '</li>';
   }
   document.getElementById('movie-details-ratings-list').innerHTML = ratingsList;
+
+  setMovieDetailsButton(movieDetails.imdbID);
 }
 
-let addToFavoritesButton = document.getElementById('add-to-favorites-button');
-addToFavoritesButton.addEventListener('click', function(event) {
-  event.preventDefault();
-  let loggedIn = isLoggedIn();
-  if(!loggedIn) {
-    openModal('not-logged-in-modal');
-    closeModal('movie-details-modal');
-  } else {
-    let movie_id = document.getElementById('movie-details-imdbid').innerHTML;
-    let user_id = sessionStorage.user_id;
-    let url = "/api/favorites";
-    let newFavoriteMovieData = {
-      favorite_movie_id: movie_id,
-      user_id: user_id
+function createAddToFavoritesListener() {
+  let addToFavoritesButton = document.getElementById('add-to-favorites-button');
+  addToFavoritesButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    let loggedIn = isLoggedIn();
+    if(!loggedIn) {
+      openModal('not-logged-in-modal');
+      closeModal('movie-details-modal');
+    } else {
+      let movie_id = document.getElementById('movie-details-imdbid').innerHTML;
+      let user_id = sessionStorage.user_id;
+      let url = "/api/favorites/";
+      let newFavoriteMovieData = {
+        favorite_movie_id: movie_id,
+        user_id: user_id
+      }
+
+      fetch(url, {
+        method: 'POST',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newFavoriteMovieData),
+      })
+      .then(res => res.json())
+      .then(response => {
+        document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="remove-from-favorites-button" class="button is-danger" data-movie-id="' + response['id'] + '"">Remove From Favorites</button>';
+        createRemoveFromFavoritesListener();
+      })
+      .catch(error => console.error('Error: ', error));
     }
-    fetch(url, {
-      method: 'POST',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newFavoriteMovieData),
+  });
+}
+
+function createRemoveFromFavoritesListener(removeFromList) {
+  let removeFromFavoritesButton = document.getElementById('remove-from-favorites-button');
+  removeFromFavoritesButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    let id = this.getAttribute('data-movie-id');
+    let url = "/api/favorites/";
+
+    fetch(url + id, {
+      method: 'DELETE'
     })
     .then(res => res.json())
     .then(response => {
-      console.log('Success: ', response);
+      document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="add-to-favorites-button" class="button is-success">Add to Favorites</button>';
+      createAddToFavoritesListener();
+    })
+    .catch(error => console.error('Error: ', error));
+  });
+}
+
+function setMovieDetailsButton(movie_id) {
+  let user_id = sessionStorage.user_id ? sessionStorage.user_id : null;
+  if(movie_id) {
+    fetch('/api/favorites/' + user_id + '/' + movie_id)
+    .then(res => res.json())
+    .then(response => {
+      if(!response['movie']) {
+        document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="add-to-favorites-button" class="button is-success">Add to Favorites</button>';
+        createAddToFavoritesListener();
+      } else {
+        document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="remove-from-favorites-button" class="button is-danger" data-movie-id="' + response['movie']['id'] + '"">Remove From Favorites</button>';
+        createRemoveFromFavoritesListener();
+      }
     })
     .catch(error => console.error('Error: ', error));
   }
-}); 
-
-function createFavoriteMovie() {
-  let formMovieId = 'tt0120338';
-  let formUserId = 1;
-  let url = "/api/favorites";
-  // let params = "user_id=" + formUserId + "&favorite_movie_id=" + formMovieId;
-  let newFavoriteMovieData = {
-    favorite_movie_id: formMovieId,
-    user_id: formUserId
-  }
-  fetch(url, {
-    method: 'POST',
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, *same-origin, omit
-    headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded'
-        // "Access-Control-Origin": "*"
-    },
-    body: JSON.stringify(newFavoriteMovieData),
-  })
-  .then(res => res.json())
-  .then(response => console.log('Success: ', response))
-  .catch(error => console.error('Error: ', error));
-}
+};

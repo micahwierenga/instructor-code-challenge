@@ -25,6 +25,19 @@ function searchOne(req, res) {
 	})
 };
 
+function findByMovieIdAndUserId(req, res) {
+	console.log(req.params);
+	FavoriteMovie.findOne({
+		where: {
+			user_id: req.params.user_id,
+			favorite_movie_id: req.params.favorite_movie_id
+		}
+	})
+	.then(function(movie) {
+    	res.json({movie: movie});
+    });
+}
+
 function index(req, res) {
 	console.log('Yippee index');
 	FavoriteMovie.findAll()
@@ -70,13 +83,14 @@ function destroy(req, res) {
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.destroy();
 	    })
-	    .then(function() {
-	    	res.redirect('/index');
+	    .then(function(favoriteMovie) {
+	    	res.json(favoriteMovie);
 	    });
 }
 
 module.exports.search = search;
 module.exports.searchOne = searchOne;
+module.exports.findByMovieIdAndUserId = findByMovieIdAndUserId;
 module.exports.index = index;
 module.exports.show = show;
 module.exports.create = create;
