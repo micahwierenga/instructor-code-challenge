@@ -17,7 +17,15 @@ a {
 #username-div #username-display {
 	font-size: 20px;
     font-weight: bold;
-	color: #3273dc;
+	color: #209cee;
+}
+
+#search-and-favorites-toggle-container {
+	text-align: center;
+}
+
+#search-and-favorites-toggle-container .button {
+	margin: 10px 20px;
 }
 
 #invalid-login-message-container {
@@ -46,6 +54,13 @@ a {
     border-bottom: 3px solid black;
 }
 
+#favorite-movies-container {
+	text-align: center;
+	font-size: 18px;
+	margin-top: 20px;
+	padding: 40px 25%;
+}
+
 #movie-details-image-container {
 	float: left;
 	margin: 15px;
@@ -70,7 +85,7 @@ a {
 }
 
 .header-heading {
-	font-size: 28px;
+	font-size: 24px;
 }
 
 .nav {
@@ -94,7 +109,7 @@ a {
 	justify-content: space-between;
 }
 
-.movie-result-item-odd {
+.item-odd {
 	background: #dddddd;
 }
 
@@ -104,12 +119,16 @@ a {
 	justify-content: center;
 }
 
-.movie-details-button-container {
+.movie-details-button-container  {
 	display: inline-block;
 }
 
 .details-button {
 	margin-left: 20px;
+}
+
+.remove-from-favorites-button {
+	margin-left: 10px;
 }
 
 input.input.is-medium {

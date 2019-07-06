@@ -2,12 +2,11 @@ const request = require('request');
 const db = require('../models');
 const FavoriteMovie = db.models.FavoriteMovie;
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
-const omdbUrl = "http://www.omdbapi.com/?apikey=" + OMDB_API_KEY;
+const omdbUrl = "http://www.omdbapi.com/?apikey=" + OMDB_API_KEY;  
 
 function search(req, res) {
 	let url = omdbUrl + "&s=" + req.query.title;
 	request(url, function(err, response, body) {
-		console.log('movies: ', JSON.parse(body).Search);
 	    let movies = JSON.parse(body).Search;
 	    if(!movies) {
 	    	res.json({message: 'No results found'});
@@ -20,13 +19,11 @@ function search(req, res) {
 function searchOne(req, res) {
 	let url = omdbUrl + "&i=" + req.params.id;
 	request(url, function(err, response, body) {
-		console.log('DETAILS: ', JSON.parse(body));
 	    res.json(JSON.parse(body));
 	})
 };
 
 function findByMovieIdAndUserId(req, res) {
-	console.log(req.params);
 	FavoriteMovie.findOne({
 		where: {
 			user_id: req.params.user_id,
@@ -38,8 +35,30 @@ function findByMovieIdAndUserId(req, res) {
     });
 }
 
+function findByUserId(req, res) {
+	FavoriteMovie.findAll({
+		where: {
+			user_id: req.params.user_id
+		}
+	})
+	.then(function(movies) {
+		let movieList = [];
+
+		for(let i = 0; i < movies.length; i++) {
+		    let requestUrl = omdbUrl + '&i=' + movies[i].favorite_movie_id;
+		    request(requestUrl, function(err, response, body) {
+		    	let parsedBody = JSON.parse(body);
+		    	parsedBody.id = movies[i].id;
+		    	movieList.push(parsedBody);
+			    if(movieList.length == movies.length) {
+			    	res.json(movieList);
+			    }
+		    })
+		}
+    })
+}
+
 function index(req, res) {
-	console.log('Yippee index');
 	FavoriteMovie.findAll()
 	    .then(function(favoriteMovies) {
 	    	res.json(favoriteMovies);
@@ -47,7 +66,6 @@ function index(req, res) {
 };
 
 function show(req, res) {
-	console.log('Yippee show');
 	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	console.log(favoriteMovie);
@@ -56,8 +74,6 @@ function show(req, res) {
 };
 
 function create(req, res) {
-	console.log('Yippee create favorite');
-	console.log('req.body: ', req.body);
 	FavoriteMovie.create(req.body)
 	    .then(function(newFavoriteMovie) {
 	    	console.log(newFavoriteMovie);
@@ -66,7 +82,6 @@ function create(req, res) {
 };
 
 function update(req, res) {
-	console.log('Yippee update');
 	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.updateAttributes(req.body);
@@ -77,8 +92,7 @@ function update(req, res) {
 };
 
 function destroy(req, res) {
-	console.log("here is the req.params.id" + req.params.id);
-	console.log('Yippee destroy');
+	console.log('req.params.id: ', req.params.id);
 	FavoriteMovie.findByPk(req.params.id)
 	    .then(function(favoriteMovie) {
 	    	return favoriteMovie.destroy();
@@ -91,6 +105,7 @@ function destroy(req, res) {
 module.exports.search = search;
 module.exports.searchOne = searchOne;
 module.exports.findByMovieIdAndUserId = findByMovieIdAndUserId;
+module.exports.findByUserId = findByUserId;
 module.exports.index = index;
 module.exports.show = show;
 module.exports.create = create;

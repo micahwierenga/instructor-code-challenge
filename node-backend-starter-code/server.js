@@ -27,25 +27,6 @@ app.use((req, res, next) => {
 });
 app.use(router);
 
-app.get('/favorites', function(req, res){
-  let data = fs.readFileSync('./data.json');
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
-});
-
-app.get('favorites', function(req, res){
-  if(!req.body.name || !req.body.oid){
-    res.send("Error");
-    return
-  }
-  
-  let data = JSON.parse(fs.readFileSync('./data.json'));
-  data.push(req.body);
-  fs.writeFile('./data.json', JSON.stringify(data));
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
-});
-
 app.listen(3000, function(){
   console.log("Listening on port 3000");
 });

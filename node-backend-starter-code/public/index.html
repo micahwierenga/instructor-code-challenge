@@ -17,33 +17,45 @@
 				<p id="username-display"></p>
 			</div>
 			<div id="logout-div" class="nav-item hide">
-				<button id="logout-btn" class="button is-link nav-button">LOGOUT</button>
+				<button id="logout-btn" class="button is-info nav-button">LOGOUT</button>
 			</div>
 			<div id="signup-div" class="nav-item">
 				<button id="signup-btn" class="button nav-button open-modal-button" data-modal-type="signup-modal">SIGNUP</button>
 			</div>
 			<div id="login-div" class="nav-item">
-				<button id="login-btn" class="button is-link nav-button open-modal-button" data-modal-type="login-modal">LOGIN</button>
+				<button id="login-btn" class="button is-info nav-button open-modal-button" data-modal-type="login-modal">LOGIN</button>
 			</div>
 		</div>
 	</div>
-	<div id="movie-search-container-div">
-		<div class="field is-grouped">
-		  <p class="control is-expanded">
-		    <input id="movie-search-input" class="input is-medium" type="text" placeholder="Search for movie title">
-		  </p>
-		  <p class="control">
-		    <a id="movie-search-button" class="button is-info is-medium">
-		      Search
-		    </a>
-		  </p>
+
+	<div id="search-and-favorites-toggle-container">
+		<a id="search-toggle-button" class="button is-dark">Search</a>
+		<a id="favorites-toggle-button" class="button">Favorites</a>
+	</div>
+
+	<div id="movie-search-and-results-container">
+		<div id="movie-search-container-div">
+			<div class="field is-grouped">
+			  <p class="control is-expanded">
+			    <input id="movie-search-input" class="input is-medium" type="text" placeholder="Search for movie title">
+			  </p>
+			  <p class="control">
+			    <a id="movie-search-button" class="button is-info is-medium">
+			      Search
+			    </a>
+			  </p>
+			</div>
+		</div>
+
+		<div id="movie-results-container-div">
+			<div id="movie-results-list"></div>
 		</div>
 	</div>
 
-	<div id="movie-results-container-div">
-		<div id="movie-results-list">
-		</div>
+	<div id="favorite-movies-container">
+		<div id="favorite-movies-list"></div>
 	</div>
+
 
 	<div id="signup-modal" class="modal">
 		<div class="modal-background"></div>
@@ -178,9 +190,7 @@
 				</div>
 				<div id="movie-details-buttons-container" class="field">
 				  <p class="control">
-				  	<div id="add-to-favorites-button-container" class="movie-details-button-container">
-					    
-				  	</div>
+				  	<div id="add-to-favorites-button-container" class="movie-details-button-container"></div>
 				  	<div class="movie-details-button-container">
 						<button id="login-cancel" class="button close-modal-button">Close</button>
 				  	</div>
@@ -199,7 +209,7 @@
 			</header>
 			<section class="modal-card-body">
 				<div id="not-logged-in-text-container">
-					<p id="not-logged-in-text">In order to add favorite movies, you must login or create an account.</p>
+					<p id="not-logged-in-text">In order to <span id="add-or-view-text"></span> favorite movies, you must login or create an account.</p>
 				</div>
 				<div class="field">
 				  <p class="control">

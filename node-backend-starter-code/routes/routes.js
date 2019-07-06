@@ -35,6 +35,9 @@ router.get('/api/searchMovies/:id', favoriteMoviesController.searchOne);
 // find favorite by user id and movie id
 router.get('/api/favorites/:user_id/:favorite_movie_id', favoriteMoviesController.findByMovieIdAndUserId);
 
+// find favorites by user id
+router.get('/api/favorites/:user_id', favoriteMoviesController.findByUserId);
+
 // index
 router.get('/api/favorites', favoriteMoviesController.index);
 
@@ -42,7 +45,7 @@ router.get('/api/favorites', favoriteMoviesController.index);
 router.post('/api/favorites', favoriteMoviesController.create);
 
 // show
-router.get('/api/favorites/:id', favoriteMoviesController.show);
+router.get('/api/favorite/:id', favoriteMoviesController.show);
 
 // update
 router.put('/api/favorites/:id', favoriteMoviesController.update);

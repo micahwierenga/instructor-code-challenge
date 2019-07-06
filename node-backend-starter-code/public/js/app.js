@@ -1,19 +1,27 @@
 // Handle opening and closing of modals
-let closeModalButtons = document.getElementsByClassName('close-modal-button');
-for(let i = 0; i < closeModalButtons.length; i++) {
-  closeModalButtons[i].addEventListener('click', function(event) {
-    let modal = this.closest('.modal');
-    modal.classList.remove('is-active');
-  })
+function createCloseModalEventListeners() {
+  let closeModalButtons = document.getElementsByClassName('close-modal-button');
+  for(let i = 0; i < closeModalButtons.length; i++) {
+    closeModalButtons[i].addEventListener('click', function(event) {
+      let modal = this.closest('.modal');
+      modal.classList.remove('is-active');
+    })
+  }
 }
 
-let openModalButtons = document.getElementsByClassName('open-modal-button');
-for(let i = 0; i < openModalButtons.length; i++) {
-  openModalButtons[i].addEventListener('click', function(event) {
-    let modalType = this.getAttribute('data-modal-type');
-    document.getElementById(modalType).classList.add('is-active');
-  })
+createCloseModalEventListeners();
+
+function createOpenModalEventListeners() {
+  let openModalButtons = document.getElementsByClassName('open-modal-button');
+  for(let i = 0; i < openModalButtons.length; i++) {
+    openModalButtons[i].addEventListener('click', function(event) {
+      let modalType = this.getAttribute('data-modal-type');
+      document.getElementById(modalType).classList.add('is-active');
+    })
+  }
 }
+
+createOpenModalEventListeners();
 
 function closeModal(modalId) {
   let modal = document.getElementById(modalId);
@@ -183,12 +191,15 @@ movieSearchButton.addEventListener('click', function(event) {
 function prepareMovieList(movies) {
   let movieList = '<h2 id="movie-result-header">Results</h2>';
   for(let i = 0; i < movies.length; i++) {
-    let odd = (i % 2 == 0) ? '' : ' movie-result-item-odd';
+    let odd = (i % 2 == 0) ? '' : ' item-odd';
     movieList += '<p class="movie-result-item' + odd + '"><span class="movie-results-title">' + movies[i].Title + '</span><a class="button is-success details-button open-modal-button" data-movie-id="' + movies[i].imdbID + '" data-modal-type="movie-details-modal">Details</a></p>';
   }
   document.getElementById('movie-results-list').innerHTML = movieList;
+  createDetailsButtonEventListener();
+}
 
-  // Movie details button functionality
+// Movie details button functionality
+function createDetailsButtonEventListener(hideAddToFavoritesButton) {
   let detailsButton = document.getElementsByClassName('details-button');
   for(let i = 0; i < detailsButton.length; i++) {
     detailsButton[i].addEventListener('click', function(event) {
@@ -200,9 +211,19 @@ function prepareMovieList(movies) {
       })
       .catch(error => console.error('Error: ', error));
       document.getElementById('movie-details-modal').classList.add('is-active');
+      let addToFavoritesButtonContainer = document.getElementById('add-to-favorites-button-container');
+      if(hideAddToFavoritesButton) {
+        addToFavoritesButtonContainer.classList.remove('movie-details-button-container');
+        addToFavoritesButtonContainer.classList.add('hide');
+      } else {
+        addToFavoritesButtonContainer.classList.add('movie-details-button-container');
+        addToFavoritesButtonContainer.classList.remove('hide');
+      }
     })
   }
 }
+
+createDetailsButtonEventListener();
 
 // Get movie details when Details button is clicked
 function prepareMovieDetails(movieDetails) {
@@ -230,6 +251,7 @@ function createAddToFavoritesListener() {
     event.preventDefault();
     let loggedIn = isLoggedIn();
     if(!loggedIn) {
+      document.getElementById('add-or-view-text').innerHTML = 'add';
       openModal('not-logged-in-modal');
       closeModal('movie-details-modal');
     } else {
@@ -253,14 +275,14 @@ function createAddToFavoritesListener() {
       .then(res => res.json())
       .then(response => {
         document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="remove-from-favorites-button" class="button is-danger" data-movie-id="' + response['id'] + '"">Remove From Favorites</button>';
-        createRemoveFromFavoritesListener();
+        createRemoveFromFavoritesListenerById();
       })
       .catch(error => console.error('Error: ', error));
     }
   });
 }
 
-function createRemoveFromFavoritesListener(removeFromList) {
+function createRemoveFromFavoritesListenerById() {
   let removeFromFavoritesButton = document.getElementById('remove-from-favorites-button');
   removeFromFavoritesButton.addEventListener('click', function(event) {
     event.preventDefault();
@@ -279,6 +301,33 @@ function createRemoveFromFavoritesListener(removeFromList) {
   });
 }
 
+function createRemoveFromFavoritesListenerByClass() {
+  let removeFromFavoritesButtons = document.getElementsByClassName('remove-from-favorites-button');
+  for(let i = 0; i < removeFromFavoritesButtons.length; i++) {
+    removeFromFavoritesButtons[i].addEventListener('click', function(event) {
+      event.preventDefault();
+      console.log('start that deletion');
+      let id = this.getAttribute('data-favorite-movie-id');
+      let url = "/api/favorites/";
+      console.log('full url: ', url + id);
+
+      fetch(url + id, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(response => {
+        console.log('Success: ', response);
+        let listItem = this.closest('.movie-result-item');
+        listItem.remove();
+        let event = new Event('click');
+        let favoritesToggleButton = document.getElementById('favorites-toggle-button');
+        favoritesToggleButton.dispatchEvent(event);
+      })
+      .catch(error => console.error('Error: ', error));
+    });
+  }
+}
+
 function setMovieDetailsButton(movie_id) {
   let user_id = sessionStorage.user_id ? sessionStorage.user_id : null;
   if(movie_id) {
@@ -290,9 +339,75 @@ function setMovieDetailsButton(movie_id) {
         createAddToFavoritesListener();
       } else {
         document.getElementById('add-to-favorites-button-container').innerHTML = '<button id="remove-from-favorites-button" class="button is-danger" data-movie-id="' + response['movie']['id'] + '"">Remove From Favorites</button>';
-        createRemoveFromFavoritesListener();
+        createRemoveFromFavoritesListenerById();
       }
     })
     .catch(error => console.error('Error: ', error));
   }
 };
+
+function prepareFavoritesList(favorites) {
+  let favoritesList = '<h2 id="movie-result-header">Favorites</h2>';
+
+  for(let i = 0; i < favorites.length; i++) {
+    let odd = (i % 2 == 0) ? '' : ' item-odd';
+    favoritesList += '<p class="movie-result-item' + odd + '"><span class="movie-results-title">' + favorites[i].Title + '</span><span><a class="button is-success details-button open-modal-button" data-movie-id="' + favorites[i].imdbID + '" data-modal-type="movie-details-modal">Details</a><a class="button is-danger remove-from-favorites-button" data-favorite-movie-id="' + favorites[i].id + '"><i class="fas fa-trash"></i></a></span></p>';
+  }
+  document.getElementById('favorite-movies-list').innerHTML = favoritesList;
+  createRemoveFromFavoritesListenerByClass();
+  createOpenModalEventListeners();
+  createDetailsButtonEventListener(true);
+}
+
+function createFavoritesToggleButtonEventListener() {
+  let favoritesToggleButton = document.getElementById('favorites-toggle-button');
+  favoritesToggleButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    let loggedIn = isLoggedIn();
+    if(!loggedIn) {
+      document.getElementById('add-or-view-text').innerHTML = 'view';
+      openModal('not-logged-in-modal');
+      closeModal('movie-details-modal');
+    } else {
+      getFavorites();
+    }
+  })
+}
+
+createFavoritesToggleButtonEventListener();
+
+function getFavorites() {
+  let user_id = sessionStorage.user_id ? sessionStorage.user_id : null;
+  console.log('usssser_id: ', user_id);
+  fetch('/api/favorites/' + user_id)
+  .then(res => res.json())
+  .then(response => {
+    console.log('rezzponse: ', response);
+    if(response['message']) {
+      document.getElementById('favorite-movies-list').innerHTML = '<p id="movie-results-no-results" class="has-text-danger">' + response['message'] + '. Use the search field to find movies and add them to your favorites.</p>';
+    } else {
+      prepareFavoritesList(response);
+    }
+  })
+  .catch(error => console.error('Error: ', error));
+  toggleFavoritesView()
+}
+
+let searchToggleButton = document.getElementById('search-toggle-button');
+searchToggleButton.addEventListener('click', function(event) {
+  toggleSearchView();
+})
+
+function toggleSearchView() {
+  document.getElementById('movie-search-and-results-container').classList.remove('hide')
+  document.getElementById('favorite-movies-container').classList.add('hide')
+  document.getElementById('search-toggle-button').classList.add('is-dark');
+  document.getElementById('favorites-toggle-button').classList.remove('is-dark');
+}
+
+function toggleFavoritesView() {
+  document.getElementById('favorite-movies-container').classList.remove('hide')
+  document.getElementById('movie-search-and-results-container').classList.add('hide')
+  document.getElementById('favorites-toggle-button').classList.add('is-dark');
+  document.getElementById('search-toggle-button').classList.remove('is-dark');
+}
